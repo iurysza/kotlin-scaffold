@@ -1,0 +1,31 @@
+jacoco {
+  toolVersion = jacocoVersion
+  reportsDir = file("$buildDir/jacoco")
+  jacocoTestReport {
+    reports {
+      xml.enabled true
+      html.enabled true
+    }
+  }
+  jacocoTestCoverageVerification {
+    violationRules {
+      rule {
+        element = "CLASS"
+        limit {
+          counter = "BRANCH"
+          value = "COVEREDRATIO"
+          minimum = 0.80
+        }
+        limit {
+          counter = "LINE"
+          value = "COVEREDRATIO"
+          minimum = 0.80
+        }
+      }
+    }
+  }
+}
+
+test {
+  finalizedBy jacocoTestReport
+}

@@ -1,0 +1,59 @@
+group = "com.github.iurysza.kotlin-scaffold"
+version = "$kotlinScaffoldVersion"
+
+publishing {
+  repositories {
+    maven {
+      name = "sonatype"
+      def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots"
+      def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2"
+      url = version.endsWith("SNAPSHOT") ? snapshotsRepoUrl : releasesRepoUrl
+      credentials {
+        username = findProperty("UPLOADER_USERNAME")
+        password = findProperty("UPLOADER_PASSWORD")
+      }
+    }
+  }
+
+  publications {
+    kotlinScaffold(MavenPublication) {
+      artifactId = "kotlin-library"
+      from components.java
+      pom {
+        name = "A Kotlin Library"
+        description = "A kotlin library description"
+        licenses {
+          license {
+            name = "Apache Licence 2.0"
+            url = "https://www.apache.org/licenses/LICENSE-2.0"
+          }
+        }
+        developers {
+          developer {
+            id = "iurysza"
+            name = "Iury Souza"
+            email = "iurysza@email.com"
+          }
+        }
+        scm {
+          connection = "scm:git:git://github.com/iurysza/kotlin-scaffold.git"
+          developerConnection = "scm:git:ssh://git@github.com/iurysza/kotlin-scaffold.git"
+          url = "https://github.com/iurysza/kotlin-scaffold"
+        }
+      }
+    }
+  }
+}
+
+signing {
+  def signingKey = findProperty("signingKey")
+  def signingPassword = findProperty("signingPassword")
+  useInMemoryPgpKeys(signingKey, signingPassword)
+  sign publishing.publications.kotlinScaffold
+}
+
+release {
+  preCommitText = "release:"
+  tagTemplate = "v${version}"
+  versionPropertyFile = "${rootProject.projectDir}/gradle.properties"
+}

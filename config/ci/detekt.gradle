@@ -1,0 +1,48 @@
+configurations { detekt }
+dependencies { detekt 'io.gitlab.arturbosch.detekt:detekt-cli:1.7.2' }
+
+task detektCi(type: JavaExec, group: "verification") {
+  description = "Run Kotlin static analysis on changed files."
+  main = "io.gitlab.arturbosch.detekt.cli.Main"
+  classpath = configurations.detekt
+
+  doFirst {
+    def changedFilesList = getDiffedFilesFromBranch("main")
+
+    if (changedFilesList.isEmpty()) {
+      println("No kotlin files changed! Skipping task...")
+      // forces detekt to ignore all files
+      changedFilesList = "./gradle"
+    } else {
+      println("Running detekt on the changed files:")
+      println(changedFilesList)
+    }
+
+    def reportDir = "${rootProject.buildDir}/reports/detekt"
+    def params = [
+      "--input", "${changedFilesList}",
+      "--excludes", "!**/src/**/*Test.kt, **/spotless.kt",
+      "--config", "${rootProject.rootDir}/config/ci/detekt-config.yml",
+      "--report", "xml:$reportDir/detekt-checkstyle.xml",
+      "--report", "html:$reportDir/report.html"
+    ]
+    args(params)
+  }
+}
+
+private static String getDiffedFilesFromBranch(String branch) {
+  def input = new ByteArrayOutputStream()
+  def cmd = "git diff --name-only origin/$branch --relative | grep '\\.kt\\?\$'"
+  execute(cmd, input)
+
+  if (input.toString().isEmpty()) return ""
+  // get comma separated string of files
+  return input.toString()
+    .trim()
+    .replace("\n", ",")
+
+}
+
+private static def execute(cmd, output) {
+  ['sh', '-c', cmd].execute().waitForProcessOutput(output, System.err)
+}
