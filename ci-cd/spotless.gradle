@@ -10,13 +10,17 @@ spotless {
     ktlint(ktlintVersion).userData(ktlintUserData)
     trimTrailingWhitespace()
     endWithNewline()
-    licenseHeaderFile("${rootProject.rootDir}/config/spotless.kt")
+    licenseHeaderFile("${rootProject.rootDir}/ci-cd/spotless.kt")
     targetExclude("**/spotless.kt")
   }
 
   groovyGradle {
     trimTrailingWhitespace()
     endWithNewline()
-    licenseHeaderFile("${rootProject.rootDir}/config/spotless.kt", "[import|plugins|buildscript|dependencies|pluginManagement]")
+    licenseHeaderFile("${rootProject.rootDir}/ci-cd/spotless.kt", "[import|plugins|buildscript|dependencies|pluginManagement]")
   }
+}
+
+build {
+  dependsOn spotlessApply
 }

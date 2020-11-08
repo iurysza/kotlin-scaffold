@@ -1,6 +1,10 @@
 group = "com.github.iurysza.kotlin-scaffold"
 version = "$version"
 
+java {
+  withSourcesJar()
+}
+
 publishing {
   repositories {
     maven {
@@ -9,8 +13,8 @@ publishing {
       def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2"
       url = version.endsWith("SNAPSHOT") ? snapshotsRepoUrl : releasesRepoUrl
       credentials {
-        username = findProperty("UPLOADER_USERNAME")
-        password = findProperty("UPLOADER_PASSWORD")
+        username = findProperty("SONATYPE_USERNAME")
+        password = findProperty("SONATYPE_PASSWORD")
       }
     }
   }
@@ -46,18 +50,21 @@ publishing {
 }
 
 signing {
-  def signingKey = findProperty("signingKey")
-  def signingPassword = findProperty("signingPassword")
-  useInMemoryPgpKeys(signingKey, signingPassword)
+  useGpgCmd()
   sign publishing.publications.kotlinScaffold
 }
 
 release {
   preCommitText = "release:"
-  versionProperties
   tagTemplate = "v${version}"
   versionPropertyFile = "${rootProject.projectDir}/gradle.properties"
   git {
     requireBranch = "main"
+  }
+}
+
+tasks {
+  afterReleaseBuild {
+    dependsOn publish
   }
 }

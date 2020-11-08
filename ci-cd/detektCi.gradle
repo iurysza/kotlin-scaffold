@@ -1,8 +1,9 @@
 configurations { detekt }
-dependencies { detekt 'io.gitlab.arturbosch.detekt:detekt-cli:1.7.2' }
+dependencies { detekt "io.gitlab.arturbosch.detekt:detekt-cli:$detektVersion" }
 
 task detektCi(type: JavaExec, group: "verification") {
   description = "Run Kotlin static analysis on changed files."
+  group = "CI"
   main = "io.gitlab.arturbosch.detekt.cli.Main"
   classpath = configurations.detekt
 
@@ -12,17 +13,17 @@ task detektCi(type: JavaExec, group: "verification") {
     if (changedFilesList.isEmpty()) {
       println("No kotlin files changed! Skipping task...")
       // forces detekt to ignore all files
-      changedFilesList = "./gradle"
+      changedFilesList = "$rootDir/gradle"
     } else {
       println("Running detekt on the changed files:")
       println(changedFilesList)
     }
 
-    def reportDir = "${rootProject.buildDir}/reports/detekt"
+    def reportDir = "${buildDir}/reports/detekt"
     def params = [
-      "--input", "${changedFilesList}",
+      "--input", "$changedFilesList",
       "--excludes", "!**/src/**/*Test.kt, **/spotless.kt",
-      "--config", "${rootProject.rootDir}/config/ci/detekt-config.yml",
+      "--config", "$rootDir/ci-cd/detekt-config.yml",
       "--report", "xml:$reportDir/detekt-checkstyle.xml",
       "--report", "html:$reportDir/report.html"
     ]
@@ -31,13 +32,13 @@ task detektCi(type: JavaExec, group: "verification") {
 }
 
 private static String getDiffedFilesFromBranch(String branch) {
-  def input = new ByteArrayOutputStream()
+  def outputStream = new ByteArrayOutputStream()
   def cmd = "git diff --name-only origin/$branch --relative | grep '\\.kt\\?\$'"
-  execute(cmd, input)
+  execute(cmd, outputStream)
 
-  if (input.toString().isEmpty()) return ""
+  if (outputStream.toString().isEmpty()) return ""
   // get comma separated string of files
-  return input.toString()
+  return outputStream.toString()
     .trim()
     .replace("\n", ",")
 

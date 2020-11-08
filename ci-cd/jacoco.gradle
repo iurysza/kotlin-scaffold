@@ -26,6 +26,14 @@ jacoco {
   }
 }
 
-test {
-  finalizedBy jacocoTestReport
+tasks {
+  test {
+    finalizedBy jacocoTestReport
+  }
+  jacocoTestReport {
+    dependsOn test
+  }
+  jacocoTestCoverageVerification {
+    dependsOn jacocoTestReport
+  }
 }

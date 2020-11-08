@@ -1,8 +1,9 @@
 configurations { ktlint }
-dependencies { ktlint "com.pinterest:ktlint:0.39.0" }
+dependencies { ktlint "com.pinterest:ktlint:$ktlintVersion" }
 
 task ktlintCi(type: JavaExec, group: "verification") {
   description = "Run Kotlin linter on changed files."
+  group = "CI"
   main = "com.pinterest.ktlint.Main"
   classpath = configurations.ktlint
 
@@ -18,7 +19,7 @@ task ktlintCi(type: JavaExec, group: "verification") {
       changedFilesList.each { println(it) }
     }
 
-    def reportDir = "${rootProject.buildDir}/reports/ktlint"
+    def reportDir = "$buildDir/reports/ktlint"
     def params = [
       *changedFilesList,
       ignoredFiles,

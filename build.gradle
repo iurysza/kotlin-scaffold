@@ -1,4 +1,3 @@
-
 /*
  * Copyright (C) 2020 Iury Souza.
  *
@@ -23,9 +22,12 @@ plugins {
   id "com.diffplug.spotless" version "$spotlessVersion"
 }
 
-java {
-  withSourcesJar()
-}
+apply from: "./ci-cd/spotless.gradle"
+apply from: "./ci-cd/ktlint.gradle"
+apply from: "./ci-cd/detektCi.gradle"
+apply from: "./ci-cd/jacoco.gradle"
+apply from: "./ci-cd/publishing.gradle"
+apply from: "./tasks.gradle"
 
 compileKotlin {
   kotlinOptions.jvmTarget = "1.8"
@@ -48,26 +50,3 @@ dependencies {
   testImplementation "io.kotest:kotest-runner-junit5:$kotestVersion"
   testImplementation "io.kotest:kotest-assertions-core:$kotestVersion"
 }
-
-tasks {
-  build {
-    dependsOn spotlessApply
-  }
-  jacocoTestReport {
-    dependsOn test
-  }
-  jacocoTestCoverageVerification {
-    dependsOn jacocoTestReport
-  }
-  afterReleaseBuild {
-    dependsOn publish
-  }
-}
-
-apply from: "./config/hook-installer.gradle"
-apply from: "./config/spotless.gradle"
-
-apply from: "./config/ci/ktlint.gradle"
-apply from: "./config/ci/detekt.gradle"
-apply from: "./config/ci/jacoco.gradle"
-apply from: "./config/release.gradle"

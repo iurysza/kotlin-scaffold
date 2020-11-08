@@ -1,6 +1,5 @@
-
 /*
- * Copyright (C) $YEAR Iury Souza.
+ * Copyright (C) 2020 Iury Souza.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,3 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+task installPreCommitHook(type: Copy) {
+  from file("$rootDir/ci-cd/pre-commit-hook")
+  into file("$rootDir/.git/hooks")
+  fileMode 0777
+  doLast { println "pre-commit hook added!" }
+}
+
+task formatCode {
+  group = "CI"
+  dependsOn spotlessApply
+}
+
+task verifyQualityGates {
+  group = "CI"
+  dependsOn ktlintCi, detektCi, build, jacocoTestCoverageVerification
+}
+
+task releaseAndPublishNewVersion {
+  group = "CD"
+  dependsOn(
+    verifyQualityGates,
+    publishKotlinScaffoldPublicationToSonatypeRepository
+  )
+}
