@@ -63,8 +63,3 @@ release {
   }
 }
 
-tasks {
-  afterReleaseBuild {
-    dependsOn publish
-  }
-}

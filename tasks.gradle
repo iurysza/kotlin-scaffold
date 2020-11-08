@@ -27,13 +27,24 @@ task formatCode {
 
 task verifyQualityGates {
   group = "CI"
-  dependsOn ktlintCi, detektCi, build, jacocoTestCoverageVerification
+  description = "Runs linter, static analysis and test-coverage tools."
+  dependsOn(
+    ktlintCi,
+    detektCi,
+    build,
+    jacocoTestCoverageVerification
+  )
 }
 
 task releaseAndPublishNewVersion {
   group = "CD"
+  description = """
+              |Checks code quality gates and prompts for the new version number.
+              |And finally publish the artifact to mavenCentral.
+              """
   dependsOn(
     verifyQualityGates,
+    tasks["release"],
     publishKotlinScaffoldPublicationToSonatypeRepository
   )
 }
