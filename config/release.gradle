@@ -1,5 +1,5 @@
 group = "com.github.iurysza.kotlin-scaffold"
-version = "$kotlinScaffoldVersion"
+version = "$version"
 
 publishing {
   repositories {
@@ -54,6 +54,7 @@ signing {
 
 release {
   preCommitText = "release:"
+  versionProperties
   tagTemplate = "v${version}"
   versionPropertyFile = "${rootProject.projectDir}/gradle.properties"
   git {
