@@ -126,3 +126,6 @@ hs_err_pid*
 .idea/modules.xml
 .idea/modules/
 .idea/vcs.xml
+.idea/codeStyleSettings.xml
+.idea/inspectionProfiles/Project_Default.xml
+.idea/inspectionProfiles/profiles_settings.xml
